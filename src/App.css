@@ -1,3 +1,90 @@
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
 .App {
+  height: inherit;
   text-align: center;
+}
+
+.layout {
+  padding: 10px;
+  height: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+}
+.header {
+  display: flex;
+  justify-content: flex-end;
+  position: absolute;
+  width: calc(100% - 20px);
+  top: 10px;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+.login > div {
+  margin-bottom: 10px;
+}
+.login label {
+  margin-right: 10px;
+}
+
+.class-card {
+  width: 100%;
+  max-width: 300px;
+  border: 1px solid #707070;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  text-align: start;
+}
+
+.class-card .bold {
+  font-weight: 600;
+}
+
+.loader-wrapper {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: black;
+  opacity: 0.5;
+}
+
+.loader-wrapper > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #fff;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
