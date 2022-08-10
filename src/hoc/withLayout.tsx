@@ -13,7 +13,13 @@ const withLayout = (
       <div className="layout">
         {isLoading && <Loader />}
         {isLoggedIn && <Header />}
-        {isLoggedIn ? <WrappedComponent isLoggedIn={isLoggedIn} /> : <Login />}
+        <div className="component-wrapper">
+          {isLoggedIn ? (
+            <WrappedComponent isLoggedIn={isLoggedIn} />
+          ) : (
+            <Login />
+          )}
+        </div>
       </div>
     );
   };

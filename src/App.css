@@ -1,29 +1,38 @@
-html,
-body,
-#root {
-  height: 100%;
-  overflow: hidden;
-}
 .App {
   height: inherit;
   text-align: center;
 }
 
 .layout {
-  padding: 10px;
-  height: 100%;
-  position: relative;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow-y: auto;
+  flex-direction: column;
+  height: 100vh;
 }
 .header {
+  padding: 10px;
   display: flex;
   justify-content: flex-end;
-  position: absolute;
-  width: calc(100% - 20px);
-  top: 10px;
+  height: 40px;
+  border-bottom: 1px solid #707070;
+}
+.component-wrapper {
+  display: flex;
+  justify-content: center;
+  overflow-y: auto;
+  box-sizing: border-box;
+  flex: 1;
+}
+.login {
+  border: 1px solid #707070;
+  padding: 10px;
+  height: fit-content;
+  margin: auto;
+  border-radius: 8px;
+}
+.home {
+  height: fit-content;
+  margin: auto;
+  padding: 10px;
 }
 button {
   cursor: pointer;
