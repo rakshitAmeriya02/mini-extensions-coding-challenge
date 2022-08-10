@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
-  getClassById,
-  getStudentById,
-  getStudentByName,
+  getClassesByName,
+  getStudentsByClassNames,
+  getStudentsByName,
 } from "src/api/filters";
 import {
   ERROR_MESSAGES,
@@ -25,46 +25,49 @@ const initialState = {
 
 export const handleLogin = createAsyncThunk(
   "student/login",
-  async (name: string, thunkApi) => {
-    const records = await getStudentByName(name);
+  async (name: string): Promise<EnrolledClass[]> => {
+    // fetches students with matching name
+    const records = await getStudentsByName(name);
+    // filters the first student with exact name
     const matchingRecord = records.find(
       (record) => record.fields[TABLE_FIELD_NAMES.NAME] === name
     );
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (matchingRecord) {
-        const enrolledClassIds = matchingRecord.fields[
-          TABLE_FIELD_NAMES.CLASSES
-        ] as string[];
-        thunkApi.dispatch(fetchClasses(enrolledClassIds));
-        resolve(enrolledClassIds as any);
+        // fetches classes searched student has enrolled
+        const classesRecords = await getClassesByName(name);
+        const enrolledClasses = classesRecords.map((item) => ({
+          name: item.fields[TABLE_FIELD_NAMES.NAME],
+          students: item.fields[TABLE_FIELD_NAMES.STUDENTS],
+        })) as EnrolledClass[];
+        const classNames = enrolledClasses.map((item) => item.name);
+        const studentsObj: {
+          [key: string]: string;
+        } = {};
+        // fetches all the students who have enrolled in the same class / classes
+        const studentsRecords = await getStudentsByClassNames(classNames);
+        studentsRecords.forEach((item) => {
+          const id = item.id as string;
+          const name = item.fields[TABLE_FIELD_NAMES.NAME] as string;
+          studentsObj[id] = name;
+        });
+        const data = [] as EnrolledClass[];
+        // formats or filters data precisely according to searched student
+        enrolledClasses.forEach((item) => {
+          const students = item.students.map((id) => studentsObj[id]);
+          if (students.includes(name)) {
+            data.push({
+              name: item.name,
+              students,
+            });
+          }
+        });
+        resolve(data);
       } else {
         const error = new Error(ERROR_MESSAGES.STUDENT_NOT_FOUND);
         reject(error);
       }
     });
-  }
-);
-
-export const fetchClasses = createAsyncThunk(
-  "classes/fetch",
-  async (classIds: string[]) => {
-    const enrolledClasses = await Promise.all(classIds.map(getClassById));
-    const classes = await Promise.all(
-      enrolledClasses.map(async (classData) => {
-        const name = classData.fields[TABLE_FIELD_NAMES.NAME] as string;
-        const studentIds = classData.fields[
-          TABLE_FIELD_NAMES.STUDENTS
-        ] as string[];
-        const students = (await Promise.all(
-          studentIds.map((id) => getStudentById(id, TABLE_FIELD_NAMES.NAME))
-        )) as string[];
-        return {
-          name,
-          students,
-        };
-      })
-    );
-    return classes;
   }
 );
 
@@ -90,8 +93,7 @@ const appSlice = createSlice({
         state.isLoading = false;
         createNotification(NOTIFICATION_TYPE.ERROR, action.error.message);
       })
-      .addCase(fetchClasses.fulfilled, (state, action) => {
-        console.log(action);
+      .addCase(handleLogin.fulfilled, (state, action) => {
         state.classes = action.payload;
         state.isLoading = false;
         state.isLoggedIn = true;
@@ -99,10 +101,6 @@ const appSlice = createSlice({
           NOTIFICATION_TYPE.SUCCESS,
           SUCCESS_MESSAGES.LOGIN_SUCCESS
         );
-      })
-      .addCase(fetchClasses.rejected, (state, action) => {
-        state.isLoading = false;
-        createNotification(NOTIFICATION_TYPE.ERROR, action.error.message);
       });
   },
 });

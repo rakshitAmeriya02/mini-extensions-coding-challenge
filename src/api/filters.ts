@@ -1,8 +1,8 @@
 import base from "src/api";
 import { TABLES, TABLE_FIELD_NAMES } from "src/utils/constant";
-import { FieldSet, Record, Records } from "airtable";
+import { FieldSet, Records } from "airtable";
 
-export const getStudentByName = async (
+export const getStudentsByName = async (
   name: string
 ): Promise<Records<FieldSet>> => {
   const records = await base(TABLES.STUDENTS)
@@ -13,18 +13,29 @@ export const getStudentByName = async (
   return records;
 };
 
-export const getStudentById = async (
-  id: string,
-  field?: string
-): Promise<Record<FieldSet> | string> => {
-  const record = await base(TABLES.STUDENTS).find(id);
-  if (field) {
-    return record.get(field) as string;
-  }
-  return record;
+export const getStudentsByClassNames = async (
+  classes: string[]
+): Promise<Records<FieldSet>> => {
+  const formula = classes
+    .map((className) => {
+      return `SEARCH("${className}", ${TABLE_FIELD_NAMES.CLASSES})`;
+    })
+    .join(", ");
+  const records = await base(TABLES.STUDENTS)
+    .select({
+      filterByFormula: `OR(${formula})`,
+    })
+    .all();
+  return records;
 };
 
-export const getClassById = async (id: string): Promise<Record<FieldSet>> => {
-  const record = await base(TABLES.CLASSES).find(id);
-  return record;
+export const getClassesByName = async (
+  name: string
+): Promise<Records<FieldSet>> => {
+  const records = await base(TABLES.CLASSES)
+    .select({
+      filterByFormula: `SEARCH("${name}",{${TABLE_FIELD_NAMES.STUDENTS}})`,
+    })
+    .all();
+  return records;
 };
