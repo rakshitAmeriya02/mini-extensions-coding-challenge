@@ -30,3 +30,10 @@ export enum ERROR_MESSAGES {
   STUDENT_NOT_FOUND = "No records found",
 }
 
+export const TEXT = {
+  LOGIN: "Login",
+  LOGOUT: "Logout",
+  NAME: "Name",
+  STUDENTS: "Students",
+  STUDENT_NAME: "Student Name",
+};

@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { handleLogin } from "src/store/appReducer";
 import { useAppDispatch } from "src/store/hooks";
+import { TEXT } from "src/utils/constant";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -9,10 +10,10 @@ const Login = () => {
   return (
     <div className="login">
       <div>
-        <label>Student Name: </label>
+        <label>{TEXT.STUDENT_NAME}: </label>
         <input ref={name} />
       </div>
-      <button onClick={handleClick}>Login</button>
+      <button onClick={handleClick}>{TEXT.LOGIN}</button>
     </div>
   );
 };
