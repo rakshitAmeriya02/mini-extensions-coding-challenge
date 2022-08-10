@@ -4,7 +4,13 @@ import {
   getStudentById,
   getStudentByName,
 } from "src/api/filters";
-import { TABLE_FIELD_NAMES } from "src/utils/constant";
+import {
+  ERROR_MESSAGES,
+  NOTIFICATION_TYPE,
+  SUCCESS_MESSAGES,
+  TABLE_FIELD_NAMES,
+} from "src/utils/constant";
+import { createNotification } from "src/utils/helpers";
 
 interface EnrolledClass {
   name: string;
@@ -24,12 +30,18 @@ export const handleLogin = createAsyncThunk(
     const matchingRecord = records.find(
       (record) => record.fields[TABLE_FIELD_NAMES.NAME] === name
     );
-    if (matchingRecord) {
-      const enrolledClassIds = matchingRecord.fields[
-        TABLE_FIELD_NAMES.CLASSES
-      ] as string[];
-      thunkApi.dispatch(fetchClasses(enrolledClassIds));
-    }
+    return new Promise((resolve, reject) => {
+      if (matchingRecord) {
+        const enrolledClassIds = matchingRecord.fields[
+          TABLE_FIELD_NAMES.CLASSES
+        ] as string[];
+        thunkApi.dispatch(fetchClasses(enrolledClassIds));
+        resolve(enrolledClassIds as any);
+      } else {
+        const error = new Error(ERROR_MESSAGES.STUDENT_NOT_FOUND);
+        reject(error);
+      }
+    });
   }
 );
 
@@ -74,13 +86,23 @@ const appSlice = createSlice({
       .addCase(handleLogin.pending, (state) => {
         state.isLoading = true;
       })
+      .addCase(handleLogin.rejected, (state, action) => {
+        state.isLoading = false;
+        createNotification(NOTIFICATION_TYPE.ERROR, action.error.message);
+      })
       .addCase(fetchClasses.fulfilled, (state, action) => {
+        console.log(action);
         state.classes = action.payload;
         state.isLoading = false;
         state.isLoggedIn = true;
+        createNotification(
+          NOTIFICATION_TYPE.SUCCESS,
+          SUCCESS_MESSAGES.LOGIN_SUCCESS
+        );
       })
-      .addCase(fetchClasses.rejected, (state) => {
+      .addCase(fetchClasses.rejected, (state, action) => {
         state.isLoading = false;
+        createNotification(NOTIFICATION_TYPE.ERROR, action.error.message);
       });
   },
 });

@@ -8,9 +8,10 @@ const withLayout = (
 ) => {
   return () => {
     const isLoggedIn = useAppSelector((state) => state.isLoggedIn);
+    const isLoading = useAppSelector((state) => state.isLoading);
     return (
       <div className="layout">
-        <Loader />
+        {isLoading && <Loader />}
         {isLoggedIn && <Header />}
         {isLoggedIn ? <WrappedComponent isLoggedIn={isLoggedIn} /> : <Login />}
       </div>

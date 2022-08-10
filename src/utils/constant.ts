@@ -16,12 +16,17 @@ export enum TABLE_FIELD_NAMES {
   STUDENTS = "Students",
 }
 
-// export enum CLASSES_FIELDS {
-//   NAME = "fldkSRh4WHOHOyYLf",
-//   STUDENTS = "fld1TImr7nucL2tGJ",
-// }
+export enum NOTIFICATION_TYPE {
+  ERROR = "error",
+  SUCCESS = "success",
+}
 
-// export enum STUDENTS_FIELDS {
-//   NAME = "fld5ckhQnYC5iGlRR",
-//   STUDENTS = "fldc8Tyl8YheKW6Xp",
-// }
+export enum SUCCESS_MESSAGES {
+  LOGIN_SUCCESS = "Logged in successfully!",
+}
+
+export enum ERROR_MESSAGES {
+  GENERIC_ERROR = "Something went wrong!",
+  STUDENT_NOT_FOUND = "No records found",
+}
+
